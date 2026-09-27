@@ -116,11 +116,11 @@ const CRIT = {
 };
 
 /* ============================================================
-   ด่าน 0: ห้องอ่านก่อนภารกิจ (บังคับอ่านรวม 10 นาที · ไม่นับคะแนน)
+   ด่าน 0: ห้องอ่านก่อนภารกิจ (บังคับอ่านรวม 6 นาที · ไม่นับคะแนน)
    ============================================================ */
 const FAST = /[?&]fast/.test(location.search);
-const READ_TOTAL = FAST ? 0 : 600;            // วินาทีรวมขั้นต่ำ (10 นาที)
-const READ_MIN = FAST ? [0,0,0,0,0,0] : [90,110,110,100,90,100]; // ขั้นต่ำรายการ์ด (รวม 600)
+const READ_TOTAL = FAST ? 0 : 360;            // วินาทีรวมขั้นต่ำ (6 นาที)
+const READ_MIN = FAST ? [0,0,0,0,0,0] : [60,60,60,60,60,60]; // ขั้นต่ำรายการ์ด 1 นาที (รวม 360)
 const READS = [
  {t:"🧑‍🔬 1. ภารกิจของเจ้าหน้าที่แลปศูนย์รับนม", tag:"ปูพื้นด่าน 1 และ 2", body:`
   <p>ศูนย์รวบรวมน้ำนมรับนมจากหลายฟาร์มแล้วเทรวมในถังเดียว <b>นมเสียเพียงถังเดียวอาจทำให้นมทั้งถังรวมเสียหาย</b> และราคารับซื้อผูกกับองค์ประกอบและคุณภาพ ห้องแลปจึงเป็นด่านสำคัญก่อนรับนมเข้าถัง</p>
@@ -230,9 +230,9 @@ function renderRead(){
   const last=i===READS.length-1;
   app.innerHTML=`
    <div class="card rsticky" style="position:sticky;top:52px;z-index:4;padding:10px 18px">
-    <div class="row" style="justify-content:space-between"><b>📖 ด่าน 0 · ห้องอ่านก่อนภารกิจ</b><span class="small">เวลาอ่านสะสม <b id="rtot">0:00</b> / 10:00</span></div>
+    <div class="row" style="justify-content:space-between"><b>📖 ด่าน 0 · ห้องอ่านก่อนภารกิจ</b><span class="small">เวลาอ่านสะสม <b id="rtot">0:00</b> / 6:00</span></div>
     <div class="bar" style="margin-top:6px"><i id="rbar" style="width:0%"></i></div>
-    <div class="small muted rhint" style="margin-top:4px">ระบบนับเวลาเฉพาะตอนที่หน้านี้เปิดอยู่ · ต้องอ่านครบ 10 นาทีจึงเข้าด่านที่ 1 ได้ · ไม่นับคะแนน</div>
+    <div class="small muted rhint" style="margin-top:4px">ระบบนับเวลาเฉพาะตอนที่หน้านี้เปิดอยู่ · ต้องอ่านการ์ดละ 1 นาที (รวม 6 นาที) จึงเข้าด่านที่ 1 ได้ · ไม่นับคะแนน</div>
    </div>
    <div class="card"><span class="tag">การ์ด ${i+1}/${READS.length} · ${R.tag}</span><div class="steps">${steps}</div>
     <h2 style="margin-top:10px">${R.t}</h2><div class="lesson">${R.body}</div></div>
@@ -248,7 +248,7 @@ function renderRead(){
   const update=()=>{
     const tot=readTotal(), cardLeft=READ_MIN[i]-S.readSec[i], totLeft=READ_TOTAL-tot;
     const a=$("#rtot"), b=$("#rbar"), w=$("#wait"); if(!a) return;
-    a.textContent=fmtMS(Math.min(tot,600)); b.style.width=Math.min(100,READ_TOTAL?tot/READ_TOTAL*100:100)+"%";
+    a.textContent=fmtMS(Math.min(tot,READ_TOTAL||tot)); b.style.width=Math.min(100,READ_TOTAL?tot/READ_TOTAL*100:100)+"%";
     let msg="";
     if(cardLeft>0) msg=`อ่านการ์ดนี้ต่ออีก ${fmtMS(cardLeft)} นาที`;
     else if(last && totLeft>0){
@@ -491,9 +491,9 @@ function renderStart(){
   <div class="card">
    <h1>🕵️ นักสืบน้ำนม</h1>
    <p><b>ปฏิบัติการ: การตรวจวิเคราะห์องค์ประกอบน้ำนมและปัจจัยที่มีผลต่อคุณภาพน้ำนม</b><br>
-   <span class="muted">ทก.454 นวัตกรรมและการผลิตน้ำนมยั่งยืน · เล่นเดี่ยว · ประมาณ 60 นาที · คะแนนเต็ม 100</span></p>
-   <div class="farm" style="margin-bottom:14px"><h3>📖 ด่าน 0 · ห้องอ่านก่อนภารกิจ (บังคับอ่าน 10 นาที · ไม่นับคะแนน)</h3>
-     การ์ดความรู้ 6 ใบ ปูพื้นให้ด่านที่ 1 และ 2 ได้แก่ ภารกิจของแลป · เครื่องมือและหลักการตรวจ · สูตรคำนวณ · เกณฑ์ตัดสิน · สาเหตุและคำแนะนำฟาร์ม · วิธีคิดแบบนักสืบ ต้องอ่านรวมครบ 10 นาทีจึงเข้าด่านที่ 1 ได้ (ระบบนับเวลาเฉพาะตอนเปิดหน้านี้)</div>
+   <span class="muted">ทก.454 นวัตกรรมและการผลิตน้ำนมยั่งยืน · เล่นเดี่ยว · ประมาณ 55 นาที · คะแนนเต็ม 100</span></p>
+   <div class="farm" style="margin-bottom:14px"><h3>📖 ด่าน 0 · ห้องอ่านก่อนภารกิจ (บังคับอ่านการ์ดละ 1 นาที รวม 6 นาที · ไม่นับคะแนน)</h3>
+     การ์ดความรู้ 6 ใบ ปูพื้นให้ด่านที่ 1 และ 2 ได้แก่ ภารกิจของแลป · เครื่องมือและหลักการตรวจ · สูตรคำนวณ · เกณฑ์ตัดสิน · สาเหตุและคำแนะนำฟาร์ม · วิธีคิดแบบนักสืบ ต้องอ่านการ์ดละ 1 นาที รวม 6 นาที จึงเข้าด่านที่ 1 ได้ (ระบบนับเวลาเฉพาะตอนเปิดหน้านี้)</div>
    <div class="grid2">
     <div class="farm"><h3>🎓 ด่านที่ 1 · ศูนย์ฝึกเจ้าหน้าที่แลป</h3>
      เรียนวิธีตรวจ 10 บท (Milkoscan, Gerber, Kjeldahl, lactometer, จุดเยือกแข็ง, CMT, alcohol, methylene blue, pH และความเป็นกรด) ท้ายบทแต่ละบทมีคำถาม 1 ข้อ ข้อละ 2 คะแนน <b>รวม 20 คะแนน</b></div>
