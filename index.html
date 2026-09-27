@@ -482,7 +482,7 @@ function fmtTime(sec){const m=Math.floor(sec/60),s=sec%60;return m+" นาท�
 function hud(){
   const h=$("#hud");
   if(S.stage==="start"){h.textContent="";return;}
-  h.innerHTML=`${esc(S.name)} <span class="pill">คะแนน ${totalScore()} / 100</span>`;
+  h.innerHTML=`🕵️ ${esc(S.alias||S.name)} <span class="pill">คะแนน ${totalScore()} / 100</span>`;
 }
 
 /* ---------------- หน้าเริ่ม ---------------- */
@@ -505,12 +505,17 @@ function renderStart(){
     <div><label>ชื่อ–นามสกุล<input type="text" id="nm" autocomplete="name"></label></div>
     <div><label>รหัสนักศึกษา<input type="text" id="sid" inputmode="numeric"></label></div>
    </div>
+   <div class="farm" style="margin-top:12px"><label><b>🕵️ นามแฝงนักสืบ</b> <span class="small muted">(แสดงบนกระดานอันดับแทนชื่อจริง · 2–20 ตัวอักษร · ห้ามใช้ชื่อจริงหรือคำไม่สุภาพ)</span>
+    <input type="text" id="alias" maxlength="20" placeholder="เช่น นักสืบนมจืด, เชอร์ล็อกโคนม"></label>
+    <p class="small muted" style="margin:.4em 0 0">🏆 อาจารย์จะประกาศกระดานอันดับ เหรียญทอง เงิน ทองแดง และชมเชย โดยใช้นามแฝงนี้ · คะแนนเท่ากันตัดสินด้วยเวลาที่ใช้ (เร็วกว่าชนะ)</p></div>
    <p><button class="primary" id="go">เริ่มภารกิจ ▶</button> <span id="err" class="small" style="color:var(--bad)"></span></p>
   </div>`;
   $("#go").onclick=()=>{
-    const n=$("#nm").value.trim(), s=$("#sid").value.trim();
+    const n=$("#nm").value.trim(), s=$("#sid").value.trim(), al=$("#alias").value.trim().replace(/\s+/g," ");
     if(n.length<3||s.length<5){$("#err").textContent="กรุณากรอกชื่อและรหัสนักศึกษาให้ครบ";return;}
-    S.name=n;S.sid=s;S.t0=Date.now();S.stage="read";S.ri=0;save();render();
+    if(al.length<2){$("#err").textContent="กรุณาตั้งนามแฝงนักสืบ (อย่างน้อย 2 ตัวอักษร)";return;}
+    if(al===n||n.split(" ").some(w=>w.length>=2&&al.includes(w))){$("#err").textContent="นามแฝงต้องไม่ใช่ชื่อจริงของคุณ";return;}
+    S.name=n;S.sid=s;S.alias=al;S.t0=Date.now();S.stage="read";S.ri=0;save();render();
   };
 }
 
@@ -714,7 +719,7 @@ function grade(c,st){
 function hashCode(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36).toUpperCase().padStart(7,"0").slice(-6);}
 function b64u(str){const b=new TextEncoder().encode(str);let bin="";b.forEach(x=>bin+=String.fromCharCode(x));return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
 function scoreCode(score,sec){
-  const p={v:1,n:S.name,s:S.sid,sc:score,l:lessonScore(),c:CASES.map(c=>caseScore(c.id)),t:sec,e:S.tEnd};
+  const p={v:1,n:S.name,s:S.sid,a:S.alias||"",sc:score,l:lessonScore(),c:CASES.map(c=>caseScore(c.id)),t:sec,e:S.tEnd};
   const j=JSON.stringify(p);
   return "MILK-"+b64u(j)+"."+hashCode(j+"|"+CONFIG.salt);
 }
@@ -736,7 +741,7 @@ function renderEnd(){
   app.innerHTML=`<div class="card" style="text-align:center">
     <h1>🏅 ปิดคดีครบ 6 ถัง</h1>
     <div class="score-big">${score}<span style="font-size:1.4rem"> / 100</span></div>
-    <p>${esc(S.name)} · ${esc(S.sid)} · เวลาที่ใช้ ${fmtTime(sec)}</p>
+    <p>🕵️ นามแฝง <b>${esc(S.alias||"-")}</b> · ${esc(S.name)} · ${esc(S.sid)} · เวลาที่ใช้ ${fmtTime(sec)}</p>
     <div style="text-align:left;max-width:620px;margin:14px auto 0">
      <b>📋 โค้ดคะแนนของคุณ</b> <span class="small muted">(ส่งโค้ดนี้ให้อาจารย์ ห้ามแก้ไข ถ้าแก้โค้ดจะใช้ไม่ได้)</span>
      <textarea id="scode" readonly rows="3" style="width:100%;font-family:ui-monospace,Consolas,monospace;font-size:.85rem;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);word-break:break-all">${code}</textarea>
