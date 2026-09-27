@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>นักสืบน้ำนม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=Prompt:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f3ea; --card:#ffffff; --ink:#1f2a2e; --muted:#5d6b70; --line:#e3dccd;
+  --brand:#0f5c5a; --brand2:#137a76; --accent:#d98a1c; --accent-soft:#fdf1dd;
+  --ok:#2e7d4f; --ok-soft:#e5f4ea; --bad:#b3372f; --bad-soft:#fbe7e5; --warn:#a86a00; --warn-soft:#fff4d6;
+  --shadow:0 2px 10px rgba(30,40,40,.08);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141a1b; --card:#1d2527; --ink:#e9eeee; --muted:#9fb0b3; --line:#2f3a3c;
+  --brand:#4fb3ad; --brand2:#63c7c0; --accent:#f0a33a; --accent-soft:#3a2d17;
+  --ok:#6fcf97; --ok-soft:#1f3a2a; --bad:#f08b83; --bad-soft:#40211f; --warn:#f2c14e; --warn-soft:#3b3218;
+  --shadow:0 2px 10px rgba(0,0,0,.35);
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Sarabun',system-ui,sans-serif;font-size:17px;line-height:1.6}
+h1,h2,h3{font-family:'Prompt','Sarabun',sans-serif;line-height:1.3;margin:.2em 0 .5em}
+h1{font-size:1.7rem} h2{font-size:1.3rem} h3{font-size:1.08rem}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+header.top{background:var(--brand);color:#fff;padding:10px 16px;position:sticky;top:0;z-index:5;box-shadow:var(--shadow)}
+header.top .in{max-width:980px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header.top b{font-family:'Prompt',sans-serif}
+.pill{display:inline-block;background:rgba(255,255,255,.18);border-radius:999px;padding:2px 12px;font-size:.92rem;margin-left:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0;box-shadow:var(--shadow)}
+.muted{color:var(--muted)} .small{font-size:.9rem}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 16px}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+button.primary:hover{background:var(--brand2)}
+button:disabled{opacity:.45;cursor:not-allowed}
+input[type=text],input[type=number]{font:inherit;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+label.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin:7px 0;cursor:pointer;background:var(--bg)}
+label.opt:hover{border-color:var(--brand)}
+label.opt input{margin-top:6px}
+label.opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+label.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{border-radius:10px;padding:10px 14px;margin-top:10px}
+.fb.ok{background:var(--ok-soft);border-left:5px solid var(--ok)}
+.fb.no{background:var(--bad-soft);border-left:5px solid var(--bad)}
+.fb.info{background:var(--accent-soft);border-left:5px solid var(--accent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.test{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);display:flex;flex-direction:column;gap:6px}
+.test .nm{font-weight:700}
+.test .cost{font-size:.88rem;color:var(--accent);font-weight:700}
+.test.done{border-color:var(--brand);background:var(--card)}
+.res{border:1px dashed var(--brand);border-radius:12px;padding:10px 14px;margin:8px 0;background:var(--card)}
+.res h4{margin:0 0 6px;font-family:'Prompt',sans-serif;font-size:1rem;color:var(--brand)}
+table.rt{border-collapse:collapse;width:100%;font-size:.95rem}
+table.rt td,table.rt th{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
+table.rt td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.screen{font-family:ui-monospace,Consolas,monospace;background:#0e2b2a;color:#9ff5d9;border-radius:10px;padding:10px 14px;font-size:.95rem}
+.budget{font-family:'Prompt',sans-serif;font-size:1.05rem}
+.coin{color:var(--accent);font-weight:700}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.lesson p{margin:.4em 0}
+.lesson ul,.lesson ol{margin:.3em 0 .3em 1.2em;padding:0}
+.tag{display:inline-block;font-size:.8rem;font-weight:700;padding:1px 10px;border-radius:99px;background:var(--accent-soft);color:var(--warn)}
+.order-list{list-style:none;padding:0;margin:8px 0}
+.order-list li{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;margin:6px 0;background:var(--bg)}
+.order-list li .ix{font-weight:700;color:var(--brand);min-width:1.5em}
+.order-list li .sp{flex:1}
+.order-list li button{padding:2px 10px}
+.refbox table{width:100%;border-collapse:collapse;font-size:.92rem}
+.refbox td{border-bottom:1px solid var(--line);padding:4px 6px;vertical-align:top}
+details.ref{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin:10px 0}
+details.ref summary{cursor:pointer;font-weight:700;color:var(--brand)}
+.farm{background:var(--accent-soft);border-radius:12px;padding:10px 14px}
+.score-big{font-family:'Prompt',sans-serif;font-size:3rem;color:var(--brand);line-height:1}
+.code{font-family:ui-monospace,Consolas,monospace;font-size:1.5rem;letter-spacing:.15em;background:var(--accent-soft);padding:6px 14px;border-radius:10px;display:inline-block}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hidden{display:none!important}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
+.steps span{width:28px;height:8px;border-radius:99px;background:var(--line)}
+.steps span.on{background:var(--accent)} .steps span.done{background:var(--brand)}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div><b>🥛 นักสืบน้ำนม</b> <span class="small">· ทก.454 ปฏิบัติการสัปดาห์ที่ 8</span></div>
+  <div class="small" id="hud"></div>
+</div></header>
+<main class="wrap" id="app"></main>
+
+<!-- ช่องส่งคะแนนไป Google Form (ไม่แสดงบนหน้าจอ) -->
+<iframe name="gf_sink" id="gf_sink" class="hidden" title="ส่งคะแนน"></iframe>
+
+<script>
+/* ============================================================
+   ⚙️ ตั้งค่าสำหรับอาจารย์ (แก้ได้ตรงนี้)
+   ============================================================ */
+const CONFIG = {
+  // วางลิงก์ Google Form ที่ลงท้ายด้วย /formResponse และรหัส entry ของแต่ละคำถาม
+  // ถ้าเว้นว่าง เกมจะแสดง "รหัสยืนยันคะแนน" ให้นักศึกษาส่งเองแทน
+  formUrl: "",
+  entries: { name:"", sid:"", score:"", time:"", code:"", detail:"" },
+  budget: 40,            // เหรียญงบตรวจต่อ 1 ถัง
+  salt: "AT454-W08-2569" // ใช้สร้างรหัสยืนยันคะแนน
+};
+
+/* เกณฑ์ที่ใช้ในเกม (เกณฑ์สำหรับการเรียน) */
+const CRIT = {
+  fatMin: 3.2, snfMin: 8.25, densLo: 1.028, densHi: 1.033,
+  fpMax: -0.520, fpRef: -0.530, phLo: 6.6, phHi: 6.8, taLo: 0.13, taHi: 0.17,
+  mbrtBad: 2 // ชั่วโมง
+};
+
+/* ============================================================
+   ด่านที่ 1: ศูนย์ฝึกเจ้าหน้าที่แลป (10 บทเรียน × 2 คะแนน)
+   ============================================================ */
+const LESSONS = [
+ {t:"1. การเก็บและเตรียมตัวอย่างนม", body:`
+  <p>ผลวิเคราะห์ดีได้ไม่เกินตัวอย่างที่เก็บมา ถ้าตัวอย่างไม่เป็นตัวแทนของทั้งถัง ต่อให้เครื่องแพงแค่ไหนผลก็ผิด</p>
+  <ul>
+   <li><b>กวนนมในถังให้ทั่วก่อนตัก</b> เพราะเม็ดไขมันเบากว่าน้ำ จะลอยขึ้นด้านบนเมื่อตั้งทิ้งไว้</li>
+   <li>ใช้ภาชนะสะอาด ปิดฝา เขียนป้ายระบุฟาร์ม วันที่ และเวลา</li>
+   <li>เก็บเย็นประมาณ 4 °C และตรวจให้เร็วที่สุด โดยเฉพาะการตรวจเชื้อ</li>
+   <li>ก่อนตรวจไขมัน อุ่นตัวอย่างประมาณ 40 °C แล้วผสมให้เข้ากัน จากนั้นปรับอุณหภูมิตามวิธีตรวจ (Gerber ใช้ตัวอย่างที่ประมาณ 20 °C)</li>
+  </ul>`,
+  q:"ก่อนเก็บตัวอย่างจากถังรวมนม สิ่งที่ต้องทำเป็นอันดับแรกคือข้อใด",
+  o:["กวนนมในถังให้ทั่ว เพื่อให้ไขมันกระจายสม่ำเสมอ","ตักจากผิวหน้าถังเพราะสะอาดที่สุด","ตักจากก้นถังเพราะเข้มข้นที่สุด","ต้มนมให้เดือดก่อนตัก"], a:0,
+  ex:"ไขมันลอยตัวขึ้นด้านบน ถ้าไม่กวนก่อน ตัวอย่างจากผิวหน้าจะไขมันสูงเกินจริง และตัวอย่างจากก้นถังจะไขมันต่ำเกินจริง"},
+
+ {t:"2. Milkoscan — วัดด้วยแสงอินฟราเรด", body:`
+  <p>Milkoscan เป็นเครื่องวิเคราะห์อัตโนมัติที่ใช้ <b>หลักการดูดกลืนแสงอินฟราเรด (infrared spectroscopy)</b> พันธะเคมีแต่ละแบบดูดกลืนแสงที่ความยาวคลื่นเฉพาะ</p>
+  <ul>
+   <li>ไขมัน: พันธะเอสเทอร์ (C=O) และ C–H ของกรดไขมัน</li>
+   <li>โปรตีน: พันธะเปปไทด์</li>
+   <li>แล็กโทส: หมู่ O–H และ C–O ของน้ำตาล</li>
+  </ul>
+  <p>ข้อดีคือได้ ไขมัน โปรตีน แล็กโทส SNF และของแข็งทั้งหมด ภายในเวลาไม่ถึงนาที <b>แต่ต้องสอบเทียบ (calibrate) กับวิธีอ้างอิงทางเคมีเสมอ</b> เช่น Gerber หรือ Röse-Gottlieb สำหรับไขมัน และ Kjeldahl สำหรับโปรตีน</p>
+  <p class="muted small">วันนี้เราไม่มีเครื่อง จึงเรียนวิธีเคมีแบบ wet chemistry ที่เครื่องต้องใช้เทียบค่าแทน</p>`,
+  q:"ข้อใดถูกต้องเกี่ยวกับ Milkoscan",
+  o:["วัดการดูดกลืนแสงอินฟราเรดของพันธะเฉพาะ และต้องสอบเทียบกับวิธีเคมีอ้างอิง","วัดความหนาแน่นของนมแล้วคำนวณเป็นไขมัน","ใช้กรดย่อยนมแล้วอ่านปริมาณไขมันจากหลอด","นับจำนวนแบคทีเรียด้วยกล้องจุลทรรศน์"], a:0,
+  ex:"Milkoscan ใช้หลักการ IR spectroscopy ค่าที่ได้จะถูกต้องก็ต่อเมื่อสอบเทียบกับวิธีเคมีอ้างอิงอย่างสม่ำเสมอ"},
+
+ {t:"3. Gerber — ตรวจไขมันด้วยกรด", body:`
+  <p>หลักการ: <b>กรดซัลฟิวริกเข้มข้นย่อยโปรตีน (เคซีน) และทำลายเยื่อหุ้มเม็ดไขมัน</b> ไขมันจึงหลุดออกมารวมตัวกัน <b>เอมิลแอลกอฮอล์</b>ช่วยให้ไขมันแยกชั้นชัดเจน จากนั้นนำไปปั่นเหวี่ยงให้ไขมันขึ้นไปอยู่ที่คอหลอด butyrometer ซึ่งมีขีดบอกเปอร์เซ็นต์ไขมันโดยตรง</p>
+  <p><b>ขั้นตอนมาตรฐาน:</b> ใส่กรดซัลฟิวริก 10 มล. ลงใน butyrometer → ค่อย ๆ ปล่อยนม 11 มล. ไหลตามผนังหลอดให้เป็นชั้นเหนือกรด → เติมเอมิลแอลกอฮอล์ 1 มล. → ปิดจุกแล้วเขย่าจนเนื้อนมละลายหมด → ปั่นเหวี่ยงประมาณ 4–5 นาที → แช่น้ำ 65 °C ประมาณ 5 นาที → อ่านค่าที่คอหลอด</p>
+  <p class="fb info small">⚠️ ความปลอดภัย: กรดเข้มข้นกับนมทำปฏิกิริยาแล้วร้อนมาก ต้องสวมแว่นตาและถุงมือ และหันปากหลอดออกจากตัวเสมอ</p>`,
+  type:"order",
+  q:"เรียงลำดับขั้นตอนตรวจไขมันแบบ Gerber ให้ถูกต้อง (กดลูกศร ▲▼ เพื่อเลื่อน)",
+  items:["ใส่กรดซัลฟิวริก 10 มล. ลงใน butyrometer","ค่อย ๆ ปล่อยนม 11 มล. ตามผนังหลอด","เติมเอมิลแอลกอฮอล์ 1 มล.","ปิดจุก เขย่าจนเนื้อนมละลายหมด","ปั่นเหวี่ยง 4–5 นาที","แช่น้ำ 65 °C ประมาณ 5 นาที","อ่านเปอร์เซ็นต์ไขมันที่คอหลอด"],
+  ex:"ลำดับ: กรด → นม → เอมิลแอลกอฮอล์ → เขย่า → ปั่นเหวี่ยง → แช่น้ำ 65 °C → อ่านค่า การแช่น้ำ 65 °C ทำให้ไขมันอยู่ในสภาพของเหลวที่อุณหภูมิเดียวกับตอนสอบเทียบหลอด"},
+
+ {t:"4. โปรตีน — วิธี Kjeldahl", body:`
+  <p>วิธีอ้างอิงสำหรับโปรตีนคือ <b>Kjeldahl</b> หลักการคือวัด<b>ไนโตรเจนทั้งหมด</b> แล้วคูณด้วยตัวคูณเพื่อแปลงเป็นโปรตีน มี 3 ขั้นตอน</p>
+  <ol><li><b>ย่อย (digestion):</b> ใช้กรดซัลฟิวริกกับตัวเร่ง เปลี่ยนไนโตรเจนเป็นแอมโมเนียมซัลเฟต</li>
+  <li><b>กลั่น (distillation):</b> เติมด่างให้เกิดแอมโมเนีย แล้วกลั่นแอมโมเนียไปจับกับกรดบอริก</li>
+  <li><b>ไทเทรต (titration):</b> ไทเทรตด้วยกรดมาตรฐาน เพื่อหาปริมาณไนโตรเจน</li></ol>
+  <p>สำหรับนมและผลิตภัณฑ์นม ใช้ตัวคูณ <b>6.38</b> (ส่วนอาหารสัตว์ทั่วไปใช้ 6.25)</p>`,
+  q:"ถ้าตัวอย่างนมมีไนโตรเจน 0.50% จะมีโปรตีนประมาณเท่าใด",
+  o:["3.19%","3.13%","0.50%","5.00%"], a:0,
+  ex:"0.50 × 6.38 = 3.19% (ถ้าใช้ 6.25 จะได้ 3.13% ซึ่งเป็นตัวคูณของอาหารสัตว์ ไม่ใช่นม)"},
+
+ {t:"5. Lactometer — ความหนาแน่นและ SNF", body:`
+  <p>Lactometer เป็นไฮโดรมิเตอร์ที่ลอยในนมแล้วอ่านค่าความหนาแน่นได้ นมปกติมีความหนาแน่นประมาณ <b>1.028–1.033 ก./มล.</b></p>
+  <ul><li><b>เติมน้ำ</b> → ความหนาแน่นลดลง</li>
+  <li><b>ตักไขมันออก</b> → ความหนาแน่นเพิ่มขึ้น (เพราะไขมันเบากว่าน้ำ)</li>
+  <li>ค่า lactometer (CLR) = (ความหนาแน่น − 1) × 1000 เช่น 1.030 → CLR 30 และต้องปรับแก้ตามอุณหภูมิที่อ่าน ตามตารางของไฮโดรมิเตอร์</li></ul>
+  <p>ถ้ารู้ทั้ง CLR และไขมัน (F) จะประมาณ SNF ได้ด้วย<b>สูตร Richmond</b>:<br><span class="screen">SNF (%) = 0.25 × CLR + 0.22 × F + 0.72</span></p>`,
+  q:"นมมีค่า CLR = 30 และไขมัน 4.0% จงคำนวณ SNF ด้วยสูตร Richmond",
+  o:["9.10%","8.50%","7.50%","10.22%"], a:0,
+  ex:"0.25×30 + 0.22×4.0 + 0.72 = 7.50 + 0.88 + 0.72 = 9.10%"},
+
+ {t:"6. จุดเยือกแข็ง — จับการเติมน้ำ", body:`
+  <p>จุดเยือกแข็งของนมขึ้นกับปริมาณสารที่ละลายอยู่ (แล็กโทสและเกลือแร่) ซึ่งค่อนข้างคงที่ นมปกติเยือกแข็งที่ประมาณ <b>−0.52 ถึง −0.55 °C</b></p>
+  <p>ถ้าเติมน้ำ สารละลายจะเจือจาง จุดเยือกแข็งจึงขยับเข้าหา 0 °C เป็นวิธีที่ไวที่สุดในการจับการเติมน้ำ</p>
+  <p class="screen">% น้ำที่เติม ≈ (FP อ้างอิง − FP ตัวอย่าง) ÷ FP อ้างอิง × 100</p>
+  <p class="small muted">ในเกมนี้ใช้ FP อ้างอิง = −0.530 °C และเกณฑ์สงสัยเติมน้ำคือ FP สูงกว่า −0.520 °C (เข้าใกล้ 0 มากกว่า)</p>`,
+  q:"ตัวอย่างนมมีจุดเยือกแข็ง −0.477 °C (อ้างอิง −0.530 °C) มีน้ำเติมประมาณกี่เปอร์เซ็นต์",
+  o:["10%","5%","47.7%","90%"], a:0,
+  ex:"(−0.530 − (−0.477)) ÷ −0.530 × 100 = 0.053 ÷ 0.530 × 100 = 10%"},
+
+ {t:"7. CMT — California Mastitis Test", body:`
+  <p>ผสมนมกับน้ำยา CMT ในอัตราส่วน 1:1 ในถาดตรวจ 4 ช่อง (1 ช่องต่อ 1 เต้า) แล้วหมุนถาดเบา ๆ ประมาณ 10 วินาที</p>
+  <p>หลักการ: น้ำยาเป็น<b>สารลดแรงตึงผิว ทำลายเยื่อหุ้มเซลล์โซมาติก</b> DNA ที่ออกมาจะรวมตัวเป็นเจล ยิ่งมีเซลล์มาก ส่วนผสมยิ่งข้นหนืด น้ำยามีสีม่วง (bromocresol purple) ซึ่งเข้มขึ้นเมื่อนมเป็นด่างมากขึ้น เช่น นมจากเต้าอักเสบ</p>
+  <table class="rt"><tr><th>ผล</th><th>ลักษณะ</th><th>SCC โดยประมาณ (เซลล์/มล.)</th></tr>
+  <tr><td>N</td><td>ใส ไม่มีเจล</td><td>ต่ำกว่า 200,000</td></tr>
+  <tr><td>T (trace)</td><td>มีเจลเล็กน้อย หายเมื่อหมุนต่อ</td><td>200,000–400,000</td></tr>
+  <tr><td>1</td><td>เจลชัด แต่ไม่จับเป็นก้อน</td><td>400,000–1,200,000</td></tr>
+  <tr><td>2</td><td>ข้นทันที เริ่มจับตัวกลางถาด</td><td>1,200,000–5,000,000</td></tr>
+  <tr><td>3</td><td>เป็นก้อนเจลนูน ติดถาด</td><td>มากกว่า 5,000,000</td></tr></table>`,
+  q:"เหตุใดนมที่มีเซลล์โซมาติกมากจึงข้นเป็นเจลเมื่อผสมน้ำยา CMT",
+  o:["น้ำยาทำลายเยื่อหุ้มเซลล์ DNA ที่ออกมารวมตัวเป็นเจล","น้ำยาทำให้ไขมันนมจับตัวเป็นก้อน","น้ำยาทำปฏิกิริยากับแล็กโทสจนหนืด","แบคทีเรียในนมผลิตเมือกออกมาทันที"], a:0,
+  ex:"CMT ประเมินจำนวนเซลล์โซมาติกทางอ้อม ผ่านปริมาณ DNA ที่ปล่อยออกมาเมื่อเซลล์ถูกทำลาย"},
+
+ {t:"8. Alcohol test — ความเสถียรของโปรตีน", body:`
+  <p>ผสมนมกับเอทานอล (ความเข้มข้นตามที่ศูนย์รับนมกำหนด เช่น 68% หรือ 75%) ในปริมาตรเท่ากัน แล้วสังเกตว่ามีตะกอนเกิดขึ้นหรือไม่</p>
+  <ul><li><b>ผลลบ:</b> ไม่เกิดตะกอน โปรตีนเสถียร ทนการแปรรูปด้วยความร้อนได้</li>
+  <li><b>ผลบวก:</b> มีตะกอนหรือเกล็ด โปรตีนไม่เสถียร สาเหตุที่พบบ่อยคือ <b>นมเป็นกรด</b> (แบคทีเรียเปลี่ยนแล็กโทสเป็นกรดแล็กติก), <b>น้ำนมเหลืองปน</b> หรือความไม่สมดุลของเกลือแร่</li></ul>
+  <p>เป็นการตรวจหน้าลานรับนมที่เร็วและถูกที่สุด นมผลบวกมักไม่ถูกรับเข้าถังรวม</p>`,
+  q:"นมให้ผลบวกต่อ alcohol test (เกิดตะกอน) สาเหตุที่เป็นไปได้คือข้อใด",
+  o:["นมเป็นกรดจากแบคทีเรีย หรือมีน้ำนมเหลืองปน","นมมีไขมันสูง","นมถูกเติมน้ำ","นมมีความหนาแน่นสูงเพราะตักไขมันออก"], a:0,
+  ex:"alcohol test วัดความเสถียรของโปรตีน นมเปรี้ยวและน้ำนมเหลืองทำให้โปรตีนตกตะกอนง่าย ส่วนการเติมน้ำไม่ทำให้เกิดตะกอน"},
+
+ {t:"9. Methylene Blue Reduction Test (MBRT)", body:`
+  <p>ใส่นม 10 มล. และสารละลายเมทิลีนบลู 1 มล. ในหลอดสะอาด ปิดจุก แล้วบ่มที่ 37 °C สังเกตเวลาที่<b>สีฟ้าจางหายไป</b></p>
+  <p>หลักการ: แบคทีเรียที่มีชีวิตใช้ออกซิเจนและ<b>รีดิวซ์เมทิลีนบลูจนไม่มีสี</b> ยิ่งมีแบคทีเรียมาก สียิ่งจางเร็ว</p>
+  <table class="rt"><tr><th>เวลาที่สีจาง (เกณฑ์ในเกม)</th><th>คุณภาพทางจุลินทรีย์</th></tr>
+  <tr><td>5 ชั่วโมงขึ้นไป</td><td>ดี</td></tr><tr><td>2–5 ชั่วโมง</td><td>พอใช้</td></tr><tr><td>น้อยกว่า 2 ชั่วโมง</td><td>แย่ — แบคทีเรียสูง</td></tr></table>`,
+  q:"ตัวอย่างนมที่สีฟ้าจางหายภายใน 30 นาที หมายความว่าอย่างไร",
+  o:["มีแบคทีเรียสูงมาก คุณภาพทางจุลินทรีย์แย่","มีไขมันสูง","มีเซลล์โซมาติกต่ำ","คุณภาพดีมาก เพราะนมสดใหม่"], a:0,
+  ex:"สีจางเร็วแปลว่ามีแบคทีเรียจำนวนมากที่ใช้ออกซิเจนและรีดิวซ์สีอย่างรวดเร็ว"},
+
+ {t:"10. pH และความเป็นกรดที่ไทเทรตได้", body:`
+  <p>นมปกติมี pH ประมาณ <b>6.6–6.8</b> และความเป็นกรดที่ไทเทรตได้ (TA) ประมาณ <b>0.13–0.17% กรดแล็กติก</b></p>
+  <p><b>วิธีไทเทรต:</b> ตวงนม 9 มล. เติม phenolphthalein 3–5 หยด แล้วไทเทรตด้วย NaOH 0.1 N จนเป็นสีชมพูอ่อนที่คงอยู่ประมาณ 30 วินาที</p>
+  <p class="screen">%TA (กรดแล็กติก) = มล. NaOH × N × 0.09 × 100 ÷ มล. นม<br>เมื่อใช้นม 9 มล. และ NaOH 0.1 N → %TA = มล. NaOH × 0.1</p>
+  <ul><li>TA สูง / pH ต่ำ → นมเริ่มเปรี้ยว หรือมีน้ำนมเหลืองปน</li>
+  <li>pH สูงกว่าปกติ / TA ต่ำ → พบในนมจากเต้าอักเสบ (ส่วนประกอบจากเลือดรั่วเข้ามา)</li></ul>`,
+  q:"ไทเทรตนม 9 มล. ใช้ NaOH 0.1 N ไป 1.6 มล. นมนี้มีความเป็นกรดเท่าใด และปกติหรือไม่",
+  o:["0.16% ปกติ","1.6% เปรี้ยวมาก","0.016% ต่ำผิดปกติ","0.32% เปรี้ยว"], a:0,
+  ex:"1.6 × 0.1 = 0.16% กรดแล็กติก อยู่ในช่วงปกติ 0.13–0.17%"}
+];
+
+/* ============================================================
+   ด่านที่ 2: นมปริศนา 6 ถัง
+   ============================================================ */
+const TESTS = [
+ {id:"sensory", nm:"👃 ดู สี กลิ่น ลักษณะ", cost:0, d:"ตรวจด้วยประสาทสัมผัส (ไม่ชิมนมดิบ)"},
+ {id:"history", nm:"📋 ประวัติฟาร์ม", cost:0, d:"สอบถามการจัดการในสัปดาห์นี้"},
+ {id:"milkoscan", nm:"🖥️ Milkoscan", cost:15, d:"ไขมัน โปรตีน แล็กโทส SNF TS"},
+ {id:"gerber", nm:"🧪 Gerber (ไขมัน)", cost:8, d:"ไขมันด้วยกรดซัลฟิวริก"},
+ {id:"lacto", nm:"🌡️ Lactometer", cost:4, d:"ความหนาแน่น / CLR"},
+ {id:"fp", nm:"❄️ จุดเยือกแข็ง", cost:10, d:"cryoscope จับการเติมน้ำ"},
+ {id:"cmt", nm:"🟣 CMT", cost:4, d:"ประเมิน SCC"},
+ {id:"alcohol", nm:"🍶 Alcohol test", cost:2, d:"ความเสถียรโปรตีน"},
+ {id:"mbrt", nm:"🔵 Methylene blue", cost:6, d:"ประเมินแบคทีเรีย"},
+ {id:"ph", nm:"⚗️ pH + ไทเทรตกรด", cost:5, d:"pH และ %TA"}
+];
+
+const DIAG = [
+ {id:"normal", t:"นมปกติ คุณภาพดี"},
+ {id:"water", t:"มีการเติมน้ำ"},
+ {id:"skim", t:"มีการตักหรือแยกไขมันออก"},
+ {id:"mastitis", t:"เต้านมอักเสบในฝูง (SCC สูง)"},
+ {id:"sara", t:"ไขมันนมตกจากอาหาร (เยื่อใยไม่พอ / SARA)"},
+ {id:"bact", t:"แบคทีเรียสูงจากการทำความเย็นหรือสุขลักษณะไม่ดี"},
+ {id:"colos", t:"มีน้ำนมเหลือง (colostrum) ปน"}
+];
+const DECIS = [
+ {id:"accept", t:"รับซื้อราคาปกติ"},
+ {id:"deduct", t:"รับซื้อ แต่หักราคาตามเกณฑ์คุณภาพ"},
+ {id:"reject", t:"ปฏิเสธการรับซื้อ ไม่รับเข้าถังรวม"}
+];
+const ADV = {
+ normal:"รักษามาตรฐานการจัดการเดิม ไม่ต้องแก้ไข",
+ water:"ตรวจจุดเยือกแข็งทุกล็อต และแจ้งเตือนฟาร์มเรื่องการเจือปนน้ำ",
+ mastitis:"ตรวจ CMT รายตัวรายเต้า รีดโคป่วยเป็นลำดับสุดท้าย แยกนม และจุ่มหัวนมหลังรีด",
+ sara:"เพิ่มเยื่อใยที่มีประสิทธิภาพ ปรับความยาวชิ้นหญ้า ให้อาหารหยาบก่อนอาหารข้น หรือเปลี่ยนเป็น TMR",
+ bact:"ทำความเย็นนมให้ถึงประมาณ 4 °C โดยเร็วหลังรีด ล้างอุปกรณ์ให้สะอาด และมีแผนสำรองไฟฟ้า",
+ colos:"แยกนมโคหลังคลอดช่วงแรกไว้เลี้ยงลูกโค ไม่ปนเข้าถังส่งขาย",
+ x1:"เพิ่มโปรตีนดิบในอาหารทันทีเพื่อเพิ่มองค์ประกอบนม",
+ x2:"เติมยาปฏิชีวนะลงในถังนมเพื่อฆ่าเชื้อก่อนส่ง"
+};
+
+function richmondCLR(snf,fat){return (snf-0.22*fat-0.72)/0.25;}
+
+const CASES = [
+ {id:"A", farm:"ฟาร์มลุงชัย (ส่งนม 420 กก.)", diag:"normal", dec:"accept",
+  fat:3.85, prot:3.25, lact:4.80, snf:8.75, fp:-0.535, cmt:"N", alc:"ลบ — ไม่มีตะกอน", mbrt:6.5, ph:6.70, ta:0.15,
+  sensory:"สีขาวอมครีม กลิ่นนมสดปกติ ไม่มีตะกอน ไม่มีสิ่งแปลกปลอม",
+  history:"รีดวันละ 2 เวลา ถังทำความเย็นทำงานปกติ ไม่ได้เปลี่ยนอาหารหรือคนรีดในเดือนนี้",
+  key:["milkoscan","gerber","lacto","fp","cmt","mbrt","ph","alcohol"], minTests:3,
+  why:"ทุกค่าอยู่ในเกณฑ์ ไขมัน 3.85 โปรตีน 3.25 SNF 8.75 จุดเยือกแข็ง −0.535 CMT = N MBRT นานกว่า 5 ชั่วโมง การยืนยันว่านมปกติต้องตรวจหลายด้าน อย่างน้อยองค์ประกอบ สุขภาพเต้านม และเชื้อ"},
+ {id:"B", farm:"ฟาร์มสมหวัง (ส่งนม 510 กก.)", diag:"water", dec:"reject",
+  fat:3.39, prot:2.86, lact:4.22, snf:7.70, fp:-0.466, cmt:"N", alc:"ลบ — ไม่มีตะกอน", mbrt:5.5, ph:6.74, ta:0.13,
+  sensory:"สีขาวอมฟ้าเล็กน้อย ดูใสกว่าปกติ กลิ่นปกติ",
+  history:"ปริมาณนมที่ส่งเพิ่มขึ้นประมาณ 12% ในสัปดาห์นี้ ทั้งที่จำนวนแม่รีดเท่าเดิมและไม่ได้เปลี่ยนสูตรอาหาร",
+  key:["fp","lacto"], calc:true,
+  why:"จุดเยือกแข็ง −0.466 °C สูงกว่าเกณฑ์ −0.520 ความหนาแน่นต่ำ และทุกองค์ประกอบลดลงในสัดส่วนเดียวกัน (ไขมัน โปรตีน แล็กโทส ลดราว 12%) คือลายเซ็นของการเจือจางด้วยน้ำ % น้ำ ≈ (0.530 − 0.466) ÷ 0.530 × 100 ≈ 12%"},
+ {id:"C", farm:"ฟาร์มบ้านดอน (ส่งนม 380 กก.)", diag:"mastitis", dec:"deduct",
+  fat:3.70, prot:3.28, lact:4.35, snf:8.35, fp:-0.528, cmt:"2", alc:"ลบ — ไม่มีตะกอน", mbrt:4.5, ph:6.88, ta:0.12,
+  sensory:"สีขาวปกติ บางครั้งเห็นเกล็ดเล็ก ๆ ที่ก้นขวด กลิ่นปกติ",
+  history:"มีคนงานรีดนมคนใหม่ 2 สัปดาห์ ช่วงนี้ไม่ได้จุ่มหัวนมหลังรีด ปริมาณนมรวมลดลงเล็กน้อย",
+  key:["cmt","milkoscan","ph"],
+  why:"CMT = 2 (SCC ประมาณ 1.2–5 ล้านเซลล์/มล.) แล็กโทสต่ำ 4.35 ทั้งที่นมไม่ได้ถูกเจือจาง (จุดเยือกแข็งปกติ) pH สูงและ TA ต่ำ ทั้งหมดชี้ว่าเซลล์สร้างน้ำนมถูกทำลายและส่วนประกอบจากเลือดรั่วเข้ามา นมยังรับได้แต่ต้องหักราคาตามเกณฑ์ SCC"},
+ {id:"D", farm:"ฟาร์มทุ่งทอง (ส่งนม 460 กก.)", diag:"sara", dec:"deduct",
+  fat:2.85, prot:3.18, lact:4.82, snf:8.72, fp:-0.534, cmt:"T", alc:"ลบ — ไม่มีตะกอน", mbrt:6.0, ph:6.68, ta:0.15,
+  sensory:"สีขาวปกติ กลิ่นปกติ",
+  history:"สองสัปดาห์ก่อนเพิ่มอาหารข้นจาก 6 เป็น 9 กก./ตัว/วัน ลดหญ้าหมัก และสับหญ้าละเอียดขึ้น นมเพิ่มเล็กน้อย โคเคี้ยวเอื้องน้อยลง มูลเหลว",
+  key:["milkoscan","gerber"],
+  why:"ไขมัน 2.85% ต่ำกว่าเกณฑ์ 3.2 แต่โปรตีน แล็กโทส SNF และจุดเยือกแข็งปกติ จึงไม่ใช่การเติมน้ำ ประวัติเพิ่มอาหารข้นและลดเยื่อใยคือ milk fat depression จากภาวะเป็นกรดในรูเมน ต้องแก้ที่รางอาหาร ไม่ใช่ที่คอกรีด"},
+ {id:"E", farm:"ฟาร์มหนองบัว (ส่งนม 350 กก.)", diag:"bact", dec:"reject",
+  fat:3.80, prot:3.22, lact:4.55, snf:8.55, fp:-0.548, cmt:"N", alc:"บวก — มีเกล็ดตะกอนชัดเจน", mbrt:0.5, ph:6.30, ta:0.22,
+  sensory:"กลิ่นเปรี้ยวอ่อน ๆ สีปกติ",
+  history:"เมื่อคืนไฟดับประมาณ 5 ชั่วโมง ถังทำความเย็นไม่ทำงาน นมรีดเย็นเก็บไว้ส่งรวมกับรอบเช้า",
+  key:["mbrt","alcohol","ph"],
+  why:"MBRT สีจางใน 30 นาที (แบคทีเรียสูงมาก) alcohol test ผลบวก pH 6.30 และ TA 0.22% สูงกว่าปกติ แบคทีเรียเปลี่ยนแล็กโทสเป็นกรดแล็กติก (แล็กโทสลดลงเล็กน้อย) นมนี้ไม่ควรรับเข้าถังรวม เพราะจะทำให้ทั้งถังเสีย"},
+ {id:"F", farm:"ฟาร์มเนินงาม (ส่งนม 300 กก.)", diag:"colos", dec:"reject",
+  fat:4.60, prot:4.60, lact:4.40, snf:9.90, fp:-0.545, cmt:"1", alc:"บวก — ตะกอนหนา", mbrt:5.5, ph:6.45, ta:0.20,
+  sensory:"สีเหลืองเข้มกว่าปกติ ข้นหนืด",
+  history:"มีโคคลอดใหม่ 2 ตัวเมื่อ 2 วันก่อน คนงานรีดนมทุกตัวรวมเข้าถังเดียวกัน",
+  key:["milkoscan","alcohol","ph"],
+  why:"โปรตีนสูงผิดปกติ 4.60% (อิมมูโนโกลบูลินในน้ำนมเหลือง) สีเหลืองข้น alcohol test ผลบวก TA สูง แต่ MBRT ยังดี จึงไม่ใช่นมเปรี้ยวจากแบคทีเรีย น้ำนมเหลืองไม่ทนความร้อนในการแปรรูป ต้องไม่ปนเข้าถังส่งขาย"}
+];
+
+/* ============================================================
+   สถานะเกม
+   ============================================================ */
+const KEY = "milkdetective_at454_w08";
+let S = load() || fresh();
+function fresh(){return {stage:"start", name:"", sid:"", t0:0, tEnd:0, li:0, lessonAns:{}, lessonPts:{}, order:null,
+  caseOrder:shuffle(CASES.map(c=>c.id)), ci:0, cases:{}, submitted:false};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function load(){try{const x=localStorage.getItem(KEY);return x?JSON.parse(x):null;}catch(e){return null;}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
+const $=s=>document.querySelector(s);
+const app=$("#app");
+
+function lessonScore(){return Object.values(S.lessonPts).reduce((a,b)=>a+b,0);}
+function caseScore(id){const c=S.cases[id];return c&&c.done?c.pts.total:0;}
+function totalScore(){return lessonScore()+CASES.reduce((a,c)=>a+caseScore(c.id),0);}
+function fmtTime(sec){const m=Math.floor(sec/60),s=sec%60;return m+" นาที "+s+" วินาที";}
+
+function hud(){
+  const h=$("#hud");
+  if(S.stage==="start"){h.textContent="";return;}
+  h.innerHTML=`${esc(S.name)} <span class="pill">คะแนน ${totalScore()} / 100</span>`;
+}
+
+/* ---------------- หน้าเริ่ม ---------------- */
+function renderStart(){
+  app.innerHTML=`
+  <div class="card">
+   <h1>🕵️ นักสืบน้ำนม</h1>
+   <p><b>ปฏิบัติการ: การตรวจวิเคราะห์องค์ประกอบน้ำนมและปัจจัยที่มีผลต่อคุณภาพน้ำนม</b><br>
+   <span class="muted">ทก.454 นวัตกรรมและการผลิตน้ำนมยั่งยืน · เล่นเดี่ยว · ประมาณ 50 นาที · คะแนนเต็ม 100</span></p>
+   <div class="grid2">
+    <div class="farm"><h3>🎓 ด่านที่ 1 · ศูนย์ฝึกเจ้าหน้าที่แลป</h3>
+     เรียนวิธีตรวจ 10 บท (Milkoscan, Gerber, Kjeldahl, lactometer, จุดเยือกแข็ง, CMT, alcohol, methylene blue, pH และความเป็นกรด) ท้ายบทแต่ละบทมีคำถาม 1 ข้อ ข้อละ 2 คะแนน <b>รวม 20 คะแนน</b></div>
+    <div class="farm"><h3>🔍 ด่านที่ 2 · คดีนมปริศนา 6 ถัง</h3>
+     คุณเป็นเจ้าหน้าที่แลปของศูนย์รวบรวมน้ำนม แต่ละถังมีงบตรวจ <b>${CONFIG.budget} เหรียญ</b> เลือกการตรวจเอง แล้ววินิจฉัยสาเหตุ ตัดสินใจรับซื้อ และแนะนำฟาร์ม ถังละ 13 คะแนน และมีโบนัสคำนวณ 2 คะแนน <b>รวม 80 คะแนน</b></div>
+   </div>
+   <p class="small muted">⚠️ ตอบได้ครั้งเดียวต่อข้อ ระบบบันทึกความคืบหน้าในเครื่องไว้ให้ ถ้าเผลอปิดหน้าต่าง ให้เปิดไฟล์เดิมในเบราว์เซอร์เดิมแล้วเล่นต่อได้</p>
+   <div class="grid2">
+    <div><label>ชื่อ–นามสกุล<input type="text" id="nm" autocomplete="name"></label></div>
+    <div><label>รหัสนักศึกษา<input type="text" id="sid" inputmode="numeric"></label></div>
+   </div>
+   <p><button class="primary" id="go">เริ่มภารกิจ ▶</button> <span id="err" class="small" style="color:var(--bad)"></span></p>
+  </div>`;
+  $("#go").onclick=()=>{
+    const n=$("#nm").value.trim(), s=$("#sid").value.trim();
+    if(n.length<3||s.length<5){$("#err").textContent="กรุณากรอกชื่อและรหัสนักศึกษาให้ครบ";return;}
+    S.name=n;S.sid=s;S.t0=Date.now();S.stage="lesson";save();render();
+  };
+}
+
+/* ---------------- ด่านที่ 1 ---------------- */
+function renderLesson(){
+  const i=S.li, L=LESSONS[i], answered=S.lessonAns[i]!==undefined;
+  const steps=LESSONS.map((_,k)=>`<span class="${k<i?'done':k===i?'on':''}"></span>`).join("");
+  let qhtml="";
+  if(L.type==="order"){
+    if(!S.order){S.order=shuffle(L.items.map((_,k)=>k));save();}
+    const ord=answered?S.lessonAns[i]:S.order;
+    qhtml=`<ul class="order-list">${ord.map((k,pos)=>`<li><span class="ix">${pos+1}.</span><span class="sp">${esc(L.items[k])}</span>${answered?(k===pos?"✅":"❌"):`<button data-up="${pos}" aria-label="เลื่อนขึ้น">▲</button><button data-dn="${pos}" aria-label="เลื่อนลง">▼</button>`}</li>`).join("")}</ul>`;
+  } else {
+    if(!L._perm){L._perm=shuffle(L.o.map((_,k)=>k));}
+    const perm=S["perm"+i]||(S["perm"+i]=L._perm);
+    qhtml=perm.map(k=>{
+      let cls="";
+      if(answered){ if(k===L.a) cls="correct"; else if(k===S.lessonAns[i]) cls="wrong"; }
+      return `<label class="opt ${cls}"><input type="radio" name="q" value="${k}" ${answered?"disabled":""} ${answered&&S.lessonAns[i]===k?"checked":""}><span>${esc(L.o[k])}</span></label>`;
+    }).join("");
+  }
+  let fb="";
+  if(answered){const ok=S.lessonPts[i]===2;fb=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'✅ ถูกต้อง +2':'❌ ยังไม่ถูก +0'}</b><br>${L.ex}</div>`;}
+  app.innerHTML=`
+   <div class="card">
+    <span class="tag">ด่านที่ 1 · ศูนย์ฝึก ${i+1}/${LESSONS.length}</span><div class="steps">${steps}</div>
+    <h2 style="margin-top:10px">${L.t}</h2>
+    <div class="lesson">${L.body}</div>
+   </div>
+   <div class="card">
+    <h3>❓ ${L.q} <span class="small muted">(2 คะแนน)</span></h3>
+    ${qhtml}
+    ${fb}
+    <p class="row" style="margin-top:12px">
+     ${answered?`<button class="primary" id="next">${i<LESSONS.length-1?'บทถัดไป ▶':'ไปด่านที่ 2 ▶'}</button>`:`<button class="primary" id="sub">ส่งคำตอบ</button>`}
+    </p>
+   </div>`;
+  window.scrollTo(0,0);
+  if(!answered){
+    if(L.type==="order"){
+      app.querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>{const p=+b.dataset.up;if(p>0){[S.order[p-1],S.order[p]]=[S.order[p],S.order[p-1]];save();renderLesson();}});
+      app.querySelectorAll("[data-dn]").forEach(b=>b.onclick=()=>{const p=+b.dataset.dn;if(p<S.order.length-1){[S.order[p+1],S.order[p]]=[S.order[p],S.order[p+1]];save();renderLesson();}});
+      $("#sub").onclick=()=>{S.lessonAns[i]=S.order.slice();S.lessonPts[i]=S.order.every((k,p)=>k===p)?2:0;save();render();};
+    } else {
+      $("#sub").onclick=()=>{const r=app.querySelector("input[name=q]:checked");if(!r)return;const v=+r.value;S.lessonAns[i]=v;S.lessonPts[i]=v===L.a?2:0;save();render();};
+    }
+  } else {
+    $("#next").onclick=()=>{if(i<LESSONS.length-1){S.li++;}else{S.stage="brief";}save();render();};
+  }
+}
+
+/* ---------------- บรีฟด่านที่ 2 ---------------- */
+function refCard(open){
+  return `<details class="ref" ${open?"open":""}><summary>📘 คู่มือเกณฑ์ของศูนย์รับนม (เปิดดูได้ตลอด)</summary>
+  <div class="refbox"><table>
+   <tr><td><b>องค์ประกอบปกติ</b></td><td>ไขมัน 3.5–4.0% · โปรตีน 3.0–3.5% · แล็กโทสประมาณ 4.8% · SNF 8.5–9.0%</td></tr>
+   <tr><td><b>ความหนาแน่น</b></td><td>${CRIT.densLo.toFixed(3)}–${CRIT.densHi.toFixed(3)} ก./มล. (CLR 28–33)</td></tr>
+   <tr><td><b>จุดเยือกแข็ง</b></td><td>ปกติ −0.52 ถึง −0.55 °C · สูงกว่า ${CRIT.fpMax.toFixed(3)} °C = สงสัยเติมน้ำ · อ้างอิงสำหรับคำนวณ ${CRIT.fpRef.toFixed(3)} °C</td></tr>
+   <tr><td><b>CMT</b></td><td>N / T = ปกติ · 1 ขึ้นไป = SCC สูง</td></tr>
+   <tr><td><b>MBRT</b></td><td>≥ 5 ชม. ดี · 2–5 ชม. พอใช้ · &lt; 2 ชม. แย่</td></tr>
+   <tr><td><b>pH / TA</b></td><td>pH ${CRIT.phLo}–${CRIT.phHi} · TA ${CRIT.taLo}–${CRIT.taHi}% กรดแล็กติก</td></tr>
+   <tr><td><b>กติการับซื้อ</b></td><td>
+     <b>ปฏิเสธ:</b> สงสัยเติมน้ำ · alcohol test ผลบวก · MBRT &lt; 2 ชม. · มีน้ำนมเหลืองปน<br>
+     <b>หักราคา:</b> ไขมัน &lt; ${CRIT.fatMin}% · SNF &lt; ${CRIT.snfMin}% · CMT ตั้งแต่ 1 ขึ้นไป<br>
+     <b>ราคาปกติ:</b> ผ่านทุกเกณฑ์</td></tr>
+   <tr><td><b>สูตรที่ใช้</b></td><td>SNF = 0.25×CLR + 0.22×F + 0.72 · % น้ำเติม = (FP อ้างอิง − FP ตัวอย่าง) ÷ FP อ้างอิง × 100 · %TA = มล. NaOH × 0.1 (นม 9 มล., NaOH 0.1 N)</td></tr>
+  </table><p class="small muted">เกณฑ์ในเกมใช้เพื่อการเรียน ศูนย์รับนมจริงอาจใช้เกณฑ์ต่างกัน</p></div></details>`;
+}
+function renderBrief(){
+  app.innerHTML=`<div class="card">
+   <span class="tag">ด่านที่ 1 ผ่านแล้ว · ได้ ${lessonScore()} / 20</span>
+   <h2>🔍 ด่านที่ 2: คดีนมปริศนา 6 ถัง</h2>
+   <p>เช้านี้มีนม 6 ถังจาก 6 ฟาร์มมาส่งที่ศูนย์รวบรวมน้ำนม หัวหน้าบอกว่า <i>"มีบางถังมีปัญหา ตรวจให้ละเอียด แต่อย่าใช้งบตรวจเกิน"</i></p>
+   <ol>
+    <li>แต่ละถังมีงบตรวจ <span class="coin">${CONFIG.budget} เหรียญ</span> การดูลักษณะนมและถามประวัติฟาร์มไม่มีค่าใช้จ่าย</li>
+    <li>เลือกการตรวจทีละรายการ ผลจะแสดงทันที การตรวจที่สั่งแล้วยกเลิกไม่ได้</li>
+    <li>ตอบ 3 ข้อ: <b>สาเหตุ (6)</b> · <b>การรับซื้อ (4)</b> · <b>คำแนะนำฟาร์ม (3)</b> = 13 คะแนนต่อถัง</li>
+    <li>คะแนนเต็มในข้อสาเหตุ ต้องมีหลักฐานจากการตรวจที่ใช่ (ใช้แค่ประวัติฟาร์มอย่างเดียวได้ครึ่งเดียว)</li>
+    <li>มีโบนัสคำนวณ 2 คะแนนซ่อนอยู่ในบางถัง</li>
+   </ol>
+   ${refCard(true)}
+   <p><button class="primary" id="go">เริ่มตรวจถังแรก ▶</button></p></div>`;
+  $("#go").onclick=()=>{S.stage="case";save();render();};
+}
+
+/* ---------------- ผลการตรวจ ---------------- */
+function resultHTML(c,tid){
+  const clr=richmondCLR(c.snf,c.fat), dens=1+clr/1000, ts=c.snf+c.fat;
+  const f2=x=>x.toFixed(2);
+  switch(tid){
+   case "sensory": return `<p>${c.sensory}</p>`;
+   case "history": return `<p>${c.history}</p>`;
+   case "milkoscan": return `<div class="screen">MILKOSCAN · SAMPLE ${c.id}-${S.sid.slice(-3)}<br>FAT ....... ${f2(c.fat)} %<br>PROTEIN ... ${f2(c.prot)} %<br>LACTOSE ... ${f2(c.lact)} %<br>SNF ....... ${f2(c.snf)} %<br>TS ........ ${f2(ts)} %</div>`;
+   case "gerber": return `<p>อ่านค่าที่คอหลอด butyrometer ได้ <b>${(c.fat+0.05).toFixed(1)} %</b> ไขมัน (ความละเอียดของหลอด 0.1%)</p>`;
+   case "lacto": return `<p>อ่านค่า lactometer หลังปรับแก้อุณหภูมิ: <b>CLR = ${clr.toFixed(1)}</b> → ความหนาแน่น <b>${dens.toFixed(4)} ก./มล.</b></p>`;
+   case "fp": return `<p>Cryoscope: จุดเยือกแข็ง = <b>${c.fp.toFixed(3)} °C</b></p>`;
+   case "cmt": return `<p>ถาด CMT ของตัวอย่างถังรวม: ผล <b>${c.cmt}</b> ${c.cmt==="N"?"(ใส ไม่มีเจล)":c.cmt==="T"?"(มีเจลเล็กน้อย หายเมื่อหมุนต่อ)":c.cmt==="1"?"(เจลชัด ไม่จับเป็นก้อน)":"(ข้นทันที จับตัวกลางถาด สีม่วงเข้ม)"}</p>`;
+   case "alcohol": return `<p>ผลการตรวจ: <b>${c.alc}</b></p>`;
+   case "mbrt": return `<p>บ่ม 37 °C สีฟ้าจางหายเมื่อเวลา <b>${c.mbrt>=6?"มากกว่า 6 ชั่วโมง":c.mbrt<1?Math.round(c.mbrt*60)+" นาที":c.mbrt+" ชั่วโมง"}</b></p>`;
+   case "ph": return `<p>pH = <b>${c.ph.toFixed(2)}</b> · ไทเทรตนม 9 มล. ใช้ NaOH 0.1 N ไป <b>${(c.ta*10).toFixed(1)} มล.</b></p><p class="small muted">(คำนวณ %TA เองตามสูตรในคู่มือ)</p>`;
+  }
+  return "";
+}
+
+/* ---------------- ด่านที่ 2: หน้าคดี ---------------- */
+function renderCase(){
+  const id=S.caseOrder[S.ci], c=CASES.find(x=>x.id===id);
+  const st=S.cases[id]||(S.cases[id]={used:[], spent:0, done:false, advPerm:null});
+  if(!st.advPerm){const others=shuffle(Object.keys(ADV).filter(k=>k!==c.diag)).slice(0,3);st.advPerm=shuffle([c.diag,...others]);}
+  if(!st.dxPerm){st.dxPerm=shuffle(DIAG.map(d=>d.id));}
+  save();
+  const left=CONFIG.budget-st.spent;
+  const steps=S.caseOrder.map((_,k)=>`<span class="${k<S.ci?'done':k===S.ci?'on':''}"></span>`).join("");
+  const testsHTML=TESTS.map(t=>{
+    const used=st.used.includes(t.id);
+    const can=!used&&!st.done&&t.cost<=left;
+    return `<div class="test ${used?'done':''}"><div class="nm">${t.nm}</div><div class="small muted">${t.d}</div>
+      <div class="row"><span class="cost">${t.cost===0?"ฟรี":t.cost+" เหรียญ"}</span>
+      ${used?'<span class="small">✔ ตรวจแล้ว</span>':`<button data-t="${t.id}" ${can?"":"disabled"}>ตรวจ</button>`}</div></div>`;
+  }).join("");
+  const resHTML=st.used.map(tid=>{const t=TESTS.find(x=>x.id===tid);return `<div class="res"><h4>${t.nm}</h4>${resultHTML(c,tid)}</div>`;}).join("")||`<p class="muted">ยังไม่ได้สั่งตรวจ เลือกการตรวจจากรายการด้านบน</p>`;
+
+  const radio=(name,list,chosen,correct)=>list.map(o=>{
+    let cls="";if(st.done){if(o.id===correct)cls="correct";else if(o.id===chosen)cls="wrong";}
+    return `<label class="opt ${cls}"><input type="radio" name="${name}" value="${o.id}" ${st.done?"disabled":""} ${chosen===o.id?"checked":""}><span>${esc(o.t)}</span></label>`;}).join("");
+  const dxList=st.dxPerm.map(k=>DIAG.find(d=>d.id===k));
+  const advList=st.advPerm.map(k=>({id:k,t:ADV[k]}));
+
+  let calcHTML="";
+  if(c.calc){
+    const hasFP=st.used.includes("fp");
+    calcHTML=`<div class="card" style="border-color:var(--accent)"><h3>🧮 โบนัส 2 คะแนน: นมถังนี้มีน้ำเติมประมาณกี่เปอร์เซ็นต์</h3>
+     ${hasFP||st.done?`<div class="row"><input type="number" id="calc" step="0.1" style="max-width:160px" ${st.done?"disabled":""} value="${st.calcAns??""}"> <span>%</span></div><p class="small muted">ใช้ FP อ้างอิง ${CRIT.fpRef} °C ตอบได้คลาดเคลื่อนไม่เกิน ±1%</p>`:`<p class="muted">ต้องมีผลตรวจจุดเยือกแข็งก่อนจึงจะคำนวณได้</p>`}</div>`;
+  }
+
+  let fb="";
+  if(st.done){
+    const p=st.pts;
+    fb=`<div class="fb ${p.total>=10?'ok':'no'}"><b>ผลคดีนี้: ${p.total} / ${c.calc?15:13} คะแนน</b> — สาเหตุ ${p.dx}/6 · การรับซื้อ ${p.dec}/4 · คำแนะนำ ${p.adv}/3${c.calc?` · คำนวณ ${p.calc}/2`:""}
+     ${p.dxNote?`<br><span class="small">${p.dxNote}</span>`:""}<br><br><b>🔎 เฉลย:</b> ${DIAG.find(d=>d.id===c.diag).t} → ${DECIS.find(d=>d.id===c.dec).t}<br>${c.why}</div>`;
+  }
+
+  app.innerHTML=`
+   <div class="card">
+    <span class="tag">ด่านที่ 2 · ถังที่ ${S.ci+1}/6</span><div class="steps">${steps}</div>
+    <h2 style="margin-top:10px">🥛 ถัง ${c.id}: ${c.farm}</h2>
+    <div class="budget">งบตรวจคงเหลือ <span class="coin">${left} / ${CONFIG.budget} เหรียญ</span></div>
+    <div class="bar"><i style="width:${left/CONFIG.budget*100}%"></i></div>
+   </div>
+   <div class="card"><h3>🧰 เลือกการตรวจ</h3><div class="tests">${testsHTML}</div></div>
+   <div class="card"><h3>📄 ผลการตรวจ</h3>${resHTML}</div>
+   ${refCard(false)}
+   ${calcHTML}
+   <div class="card">
+    <h3>1) สาเหตุของนมถังนี้คืออะไร <span class="small muted">(6 คะแนน)</span></h3>${radio("dx",dxList,st.dx,c.diag)}
+    <h3 style="margin-top:14px">2) ตัดสินใจรับซื้ออย่างไร <span class="small muted">(4 คะแนน)</span></h3>${radio("dec",DECIS,st.dec,c.dec)}
+    <h3 style="margin-top:14px">3) คำแนะนำที่ควรให้ฟาร์ม <span class="small muted">(3 คะแนน)</span></h3>${radio("adv",advList,st.adv,c.diag)}
+    ${fb}
+    <p class="row" style="margin-top:12px">${st.done?`<button class="primary" id="next">${S.ci<5?'ถังถัดไป ▶':'ดูผลคะแนน ▶'}</button>`:`<button class="primary" id="sub">ส่งผลการตรวจถังนี้</button> <span id="err" class="small" style="color:var(--bad)"></span>`}</p>
+   </div>`;
+
+  app.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{
+    const t=TESTS.find(x=>x.id===b.dataset.t);
+    if(st.used.includes(t.id)||t.cost>CONFIG.budget-st.spent)return;
+    keepAnswers(st);
+    st.used.push(t.id);st.spent+=t.cost;save();
+    const y=window.scrollY;renderCase();window.scrollTo(0,y);
+  });
+  if(!st.done){
+    $("#sub").onclick=()=>{
+      keepAnswers(st);
+      if(!st.dx||!st.dec||!st.adv){$("#err").textContent="กรุณาตอบให้ครบทั้ง 3 ข้อ";return;}
+      if(st.used.filter(t=>t!=="sensory"&&t!=="history").length===0 && !confirm("ยังไม่ได้สั่งตรวจทางแลปเลย ต้องการส่งคำตอบจริงหรือไม่?"))return;
+      grade(c,st);st.done=true;save();
+      const y=window.scrollY;renderCase();window.scrollTo(0,y);
+    };
+  } else {
+    $("#next").onclick=()=>{if(S.ci<5){S.ci++;}else{S.stage="end";S.tEnd=Date.now();}save();render();};
+  }
+  if(!st.done) window.scrollTo(0,0);
+}
+function keepAnswers(st){
+  const g=n=>{const r=app.querySelector(`input[name=${n}]:checked`);return r?r.value:st[n];};
+  st.dx=g("dx");st.dec=g("dec");st.adv=g("adv");
+  const ci=$("#calc");if(ci&&ci.value!=="")st.calcAns=ci.value;
+}
+function grade(c,st){
+  const labUsed=st.used.filter(t=>t!=="sensory"&&t!=="history");
+  let dx=0,dxNote="";
+  if(st.dx===c.diag){
+    const evid = c.minTests ? labUsed.length>=c.minTests : labUsed.some(t=>c.key.includes(t));
+    if(evid) dx=6; else {dx=3; dxNote=c.minTests?`ได้ครึ่งเดียว: การยืนยันว่านมปกติต้องมีผลแลปอย่างน้อย ${c.minTests} รายการ`:"ได้ครึ่งเดียว: วินิจฉัยถูกแต่ยังไม่มีผลแลปที่เป็นหลักฐานสำคัญของคดีนี้";}
+  }
+  const dec=st.dec===c.dec?4:0, adv=st.adv===c.diag?3:0;
+  let calc=0;
+  if(c.calc&&st.calcAns!==undefined&&st.calcAns!==""){const v=parseFloat(st.calcAns);if(Math.abs(v-12.1)<=1)calc=2;}
+  st.pts={dx,dec,adv,calc,dxNote,total:dx+dec+adv+calc};
+}
+
+/* ---------------- หน้าสรุป ---------------- */
+function hashCode(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36).toUpperCase().padStart(7,"0").slice(-6);}
+function b64u(str){const b=new TextEncoder().encode(str);let bin="";b.forEach(x=>bin+=String.fromCharCode(x));return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function scoreCode(score,sec){
+  const p={v:1,n:S.name,s:S.sid,sc:score,l:lessonScore(),c:CASES.map(c=>caseScore(c.id)),t:sec,e:S.tEnd};
+  const j=JSON.stringify(p);
+  return "MILK-"+b64u(j)+"."+hashCode(j+"|"+CONFIG.salt);
+}
+function copyText(txt,ta,msg){
+  const done=()=>{msg.textContent="✅ คัดลอกแล้ว นำไปวาง (Ctrl+V) ในช่องส่งงานที่อาจารย์กำหนดได้เลย";};
+  const fallback=()=>{ta.focus();ta.select();try{document.execCommand("copy");done();}catch(e){msg.textContent="คัดลอกอัตโนมัติไม่ได้ ให้กดค้างที่กล่องโค้ดแล้วเลือกคัดลอกเอง";}};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,fallback);}else fallback();
+}
+function detailStr(){
+  const L=LESSONS.map((_,i)=>S.lessonPts[i]||0).join("");
+  const C=CASES.map(c=>{const st=S.cases[c.id];return `${c.id}:${st&&st.pts?st.pts.total:0}(${st?st.dx:"-"}/${st?st.dec:"-"}/${st?st.used.length:0}ตรวจ)`;}).join(" ");
+  return `ด่าน1=${lessonScore()}/20 [${L}] | ${C}`;
+}
+function renderEnd(){
+  const score=totalScore(), sec=Math.round((S.tEnd-S.t0)/1000);
+  const code=scoreCode(score,sec);
+  const rows=CASES.map(c=>{const st=S.cases[c.id];return `<tr><td>ถัง ${c.id} · ${esc(c.farm.split(" (")[0])}</td><td>${DIAG.find(d=>d.id===c.diag).t}</td><td class="n">${st&&st.pts?st.pts.total:0} / ${c.calc?15:13}</td></tr>`;}).join("");
+  const hasForm=CONFIG.formUrl&&CONFIG.entries.sid;
+  app.innerHTML=`<div class="card" style="text-align:center">
+    <h1>🏅 ปิดคดีครบ 6 ถัง</h1>
+    <div class="score-big">${score}<span style="font-size:1.4rem"> / 100</span></div>
+    <p>${esc(S.name)} · ${esc(S.sid)} · เวลาที่ใช้ ${fmtTime(sec)}</p>
+    <div style="text-align:left;max-width:620px;margin:14px auto 0">
+     <b>📋 โค้ดคะแนนของคุณ</b> <span class="small muted">(ส่งโค้ดนี้ให้อาจารย์ ห้ามแก้ไข ถ้าแก้โค้ดจะใช้ไม่ได้)</span>
+     <textarea id="scode" readonly rows="3" style="width:100%;font-family:ui-monospace,Consolas,monospace;font-size:.85rem;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);word-break:break-all">${code}</textarea>
+     <p class="row"><button class="primary" id="cp">📋 คัดลอกโค้ดคะแนน</button> <span id="cpmsg" class="small"></span></p>
+    </div>
+    <p id="sendst" class="small"></p>
+   </div>
+   <div class="card"><h3>สรุปคะแนน</h3>
+    <table class="rt"><tr><th>ส่วน</th><th>คำตอบที่ถูก</th><th>คะแนน</th></tr>
+    <tr><td>ด่านที่ 1 · ศูนย์ฝึก 10 บท</td><td>—</td><td class="n">${lessonScore()} / 20</td></tr>${rows}
+    <tr><th colspan="2">รวม</th><th class="n">${score} / 100</th></tr></table>
+   </div>
+   <div class="card"><h3>🧠 ทบทวนก่อนออกจากเกม</h3>
+    <ul><li><b>เติมน้ำ:</b> จุดเยือกแข็งเข้าใกล้ 0 และทุกองค์ประกอบลดลงในสัดส่วนเดียวกัน</li>
+    <li><b>เต้านมอักเสบ:</b> CMT สูง แล็กโทสลด pH สูง แต่จุดเยือกแข็งปกติ</li>
+    <li><b>ไขมันตกจากอาหาร:</b> ไขมันลดตัวเดียว ส่วนค่าอื่นปกติ ต้องแก้ที่รางอาหาร</li>
+    <li><b>แบคทีเรียสูง:</b> MBRT สั้น alcohol ผลบวก TA สูง ต้องแก้ที่การทำความเย็น</li>
+    <li><b>น้ำนมเหลือง:</b> โปรตีนสูง alcohol ผลบวก แต่ MBRT ปกติ</li></ul>
+   </div>`;
+  hud();
+  $("#cp").onclick=()=>copyText(code,$("#scode"),$("#cpmsg"));
+  const st=$("#sendst");
+  if(hasForm && !S.submitted){
+    const f=document.createElement("form");f.method="POST";f.action=CONFIG.formUrl;f.target="gf_sink";f.className="hidden";
+    const E=CONFIG.entries, vals={name:S.name,sid:S.sid,score:String(score),time:String(sec),code:code,detail:detailStr()};
+    for(const k in E){if(!E[k])continue;const i=document.createElement("input");i.type="hidden";i.name=E[k];i.value=vals[k];f.appendChild(i);}
+    document.body.appendChild(f);f.submit();S.submitted=true;save();
+    st.innerHTML="✅ ส่งคะแนนเข้าระบบของอาจารย์แล้ว แคปหน้าจอนี้เก็บไว้เป็นหลักฐานด้วย";
+  } else if(hasForm){
+    st.innerHTML="✅ ส่งคะแนนแล้ว (ส่งได้ครั้งเดียว)";
+  } else {
+    st.innerHTML="กด <b>คัดลอกโค้ดคะแนน</b> แล้ววางส่งในช่องทางที่อาจารย์กำหนด (แคปหน้าจอนี้เก็บไว้เป็นหลักฐานด้วย)";
+  }
+}
+
+function render(){
+  if(location.hash==="#reset"){try{localStorage.removeItem(KEY);}catch(e){} S=fresh(); history.replaceState(null,"",location.pathname);}
+  hud();
+  if(S.stage==="start")renderStart();
+  else if(S.stage==="lesson")renderLesson();
+  else if(S.stage==="brief")renderBrief();
+  else if(S.stage==="case")renderCase();
+  else renderEnd();
+}
+window.addEventListener("hashchange",render);
+render();
+</script>
+</body>
+</html>
